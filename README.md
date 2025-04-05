@@ -18,6 +18,9 @@ dotnet ef database update
 dotnet run
 
 
+http://localhost:5226/swagger/index.html
+
+
 --Chạy ứng dụng:
 
 dotnet run
