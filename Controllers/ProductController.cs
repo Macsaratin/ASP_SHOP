@@ -1,80 +1,150 @@
-
-
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ASP_SHOP.Data;
+using ASP_SHOP.DTOs;
 using ASP_SHOP.Models;
-using System.Linq;
-
-//Dùng swager
 
 namespace ASP_SHOP.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public class ProductController : ControllerBase
+    [ApiController]
+    public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ProductController(AppDbContext context)
+        public ProductsController(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProducts()
         {
-            var products = _context.Products.ToList();
-            return Ok(products);
+            var products = await _context.Products
+                .Include(p => p.Category)
+                .ToListAsync();
+            var productDtos = _mapper.Map<List<ProductResponseDto>>(products);
+            return Ok(productDtos);
+        }
+
+
+        [HttpGet("colors")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProductsColor(
+            [FromQuery] int? categoryId,
+            [FromQuery] int? brandId,
+            [FromQuery] string? search,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var query = _context.Products
+                .AsNoTracking()
+                .Include(p => p.Category)
+                .Include(p => p.Brand)
+                .Include(p => p.Variants)
+                    .ThenInclude(pv => pv.Colors)
+                .Include(p => p.Images)
+
+                .AsQueryable();
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+            if (brandId.HasValue)
+            {
+                query = query.Where(p => p.BrandId == brandId.Value);
+            }
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            query = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize);
+
+            var products = await query.ToListAsync();
+
+            // Ánh xạ sản phẩm
+            var productDtos = _mapper.Map<List<ProductResponseColorDto>>(products);
+
+            // Trả về kết quả với phân trang
+            var response = new
+            {
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                Data = productDtos
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProduct(int id)
         {
-            var product = _context.Products.Find(id);
-            if (product == null) return NotFound();
-            return Ok(product);
+            var product = await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.Brand)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null)
+                return NotFound();
+
+            var productDto = _mapper.Map<ProductResponseDto>(product);
+            return Ok(productDto);
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Product product)
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDto productDto)
         {
-            if (string.IsNullOrEmpty(product.ImageUrl))
-            {
-                product.ImageUrl = "/images/default.png"; 
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var product = _mapper.Map<Product>(productDto);
             _context.Products.Add(product);
-            _context.SaveChanges();
-            return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
+            await _context.SaveChangesAsync();
+            var responseDto = _mapper.Map<ProductResponseDto>(product);
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, responseDto);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Product product)
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductUpdateDto productDto)
         {
-            var existingProduct = _context.Products.FirstOrDefault(p => p.Id == id);
-            if (existingProduct == null) return NotFound();
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+                return NotFound();
 
-            existingProduct.Name = product.Name;
-            existingProduct.Price = product.Price;
+            _mapper.Map(productDto, product);
+            await _context.SaveChangesAsync();
 
-            if (!string.IsNullOrEmpty(product.ImageUrl))
-            {
-                existingProduct.ImageUrl = product.ImageUrl;
-            }
-
-            _context.SaveChanges();
-            return Ok(existingProduct);
+            var responseDto = _mapper.Map<ProductResponseDto>(product);
+            return Ok(responseDto);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = _context.Products.Find(id);
-            if (product == null) return NotFound();
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+                return NotFound();
 
             _context.Products.Remove(product);
-            _context.SaveChanges();
-            return Ok(new { message = "Deleted successfully" });
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }

@@ -3,17 +3,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASP_SHOP.Models
 {
-    [Table("category")]
-    public class Category
-    {
-        [Key]
-        public int Id { get; set; }
+    [Table("categories")]
+public class Category : AuditableEntity
+{
+    [Key]
+    public int Id { get; set; }
 
-        public string? Name { get; set; }
+    public required string Name { get; set; }
 
-        public string? ImageUrl { get; set; }
+    public string? ImageUrl { get; set; }
 
-        public List<Product> Products { get; set; } = new List<Product>();
+    public int? ParentId { get; set; }
 
-    }
+    [ForeignKey("ParentId")]
+    public virtual Category? Parent { get; set; }
+
+    public virtual List<Category>? Children { get; set; }
+
+    public virtual ICollection<Product>? Products { get; set; }
+}
 }

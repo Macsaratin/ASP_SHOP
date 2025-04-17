@@ -3,16 +3,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASP_SHOP.Models
 {
-    [Table("user")]
-    public class User
+    [Table("users")]
+    public class User : AuditableEntity
     {
         [Key]
         public int Id { get; set; }
 
-        public string? Name { get; set; }
+        public required string Name { get; set; }
 
         public string? Avatar { get; set; }
 
-        public string? Email { get; set; }
+        public required string Email { get; set; }
+
+        public required string PasswordHash { get; set; }
+
+        public required RoleType Role { get; set; }
+
+        public UserStatus? UserStatus { get; set; }
+
     }
 }
