@@ -70,5 +70,33 @@ namespace CineTicket.API.Controllers
                 .Take(10)
                 .ToListAsync();
         }
+        [HttpGet("genre/{genre}")]
+            public async Task<ActionResult<IEnumerable<Movie>>> GetMoviesByGenre(string genre)
+            {
+                var movies = await _context.Movies
+                    .Where(m => m.Genre.ToLower() == genre.ToLower())  // so sánh không phân biệt chữ hoa chữ thường
+                    .ToListAsync();
+
+                if (movies == null || !movies.Any())
+                {
+                    return NotFound();
+                }
+
+                return movies;
+            }
+            // GET: api/Movies/genres
+            [HttpGet("genres")]
+            public async Task<ActionResult<IEnumerable<string>>> GetGenres()
+            {
+                var genres = await _context.Movies
+                    .Select(m => m.Genre)
+                    .Where(g => !string.IsNullOrEmpty(g))
+                    .Distinct()
+                    .ToListAsync();
+
+                return genres;
+            }
+
     }
+    
 }

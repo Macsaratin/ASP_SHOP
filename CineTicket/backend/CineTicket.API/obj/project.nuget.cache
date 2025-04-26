@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "c9ypLZgXHHE=",
+  "dgSpecHash": "hpd5+ESxO5E=",
   "success": true,
-  "projectFilePath": "F:\\zalo\\CineTicket\\CineTicket\\backend\\cineticket.api\\CineTicket.API.csproj",
+  "projectFilePath": "F:\\asp\\CineTicket\\backend\\CineTicket.API\\CineTicket.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Tutha\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Tutha\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\7.0.2\\microsoft.aspnetcore.authentication.jwtbearer.7.0.2.nupkg.sha512",

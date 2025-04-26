@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\zalo\\CineTicket\\CineTicket\\backend\\cineticket.api\\CineTicket.API.csproj": {}
+    "F:\\asp\\CineTicket\\backend\\CineTicket.API\\CineTicket.API.csproj": {}
   },
   "projects": {
-    "F:\\zalo\\CineTicket\\CineTicket\\backend\\cineticket.api\\CineTicket.API.csproj": {
+    "F:\\asp\\CineTicket\\backend\\CineTicket.API\\CineTicket.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\zalo\\CineTicket\\CineTicket\\backend\\cineticket.api\\CineTicket.API.csproj",
+        "projectUniqueName": "F:\\asp\\CineTicket\\backend\\CineTicket.API\\CineTicket.API.csproj",
         "projectName": "CineTicket.API",
-        "projectPath": "F:\\zalo\\CineTicket\\CineTicket\\backend\\cineticket.api\\CineTicket.API.csproj",
+        "projectPath": "F:\\asp\\CineTicket\\backend\\CineTicket.API\\CineTicket.API.csproj",
         "packagesPath": "C:\\Users\\Tutha\\.nuget\\packages\\",
-        "outputPath": "F:\\zalo\\CineTicket\\CineTicket\\backend\\cineticket.api\\obj\\",
+        "outputPath": "F:\\asp\\CineTicket\\backend\\CineTicket.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
