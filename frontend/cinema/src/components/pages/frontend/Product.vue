@@ -55,7 +55,7 @@
   
   // Go back to the previous page
   const goBack = () => {
-    router.push('/movies'); // Assuming '/movies' is the list of movies page
+    router.push('/Movies'); // Assuming '/movies' is the list of movies page
   };
   
   // Format date to a readable format
